@@ -1,4 +1,7 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is the provided NumberTriangle class to be used in this coding task.
@@ -88,8 +91,18 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
-        return -1;
+
+        if (path.isEmpty()){
+            return this.root;
+        }
+        char dir = path.charAt(0);
+        String remainingPath = path.substring(1);
+        if(dir == 'l' && this.left != null){
+            return this.left.retrieve(remainingPath);
+        }else{
+            return this.right.retrieve(remainingPath);
+        }
+
     }
 
     /** Read in the NumberTriangle structure from a file.
@@ -110,7 +123,8 @@ public class NumberTriangle {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
 
-        // TODO define any variables that you want to use to store things
+
+        List<int[]> triangle = new ArrayList<>();
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
@@ -118,16 +132,35 @@ public class NumberTriangle {
 
         String line = br.readLine();
         while (line != null) {
+            String[] parts = line.split(" ");
+            int[] row = Arrays.stream(parts).mapToInt(Integer::parseInt).toArray();
+            triangle.add(row);
 
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
-
-            // TODO process the line
 
             //read the next line
             line = br.readLine();
         }
+        int n = triangle.size();
+        NumberTriangle[][] nodes = new NumberTriangle[n][];
+        for (int i = 0; i < n; i++) {
+            int len = triangle.get(i).length;
+            nodes[i] = new NumberTriangle[len];
+            for (int j = 0; j < len; j++){
+                nodes[i][j] = new NumberTriangle(triangle.get(i)[j]);
+            }
+        }
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < nodes[i].length; j++) {
+                nodes[i][j].left = nodes[i + 1][j];
+                nodes[i][j].right = nodes[i + 1][j + 1];
+            }
+        }
+
+
+
         br.close();
+
+        top = nodes[0][0];
         return top;
     }
 
